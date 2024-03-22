@@ -2,34 +2,35 @@
 % Please edit documentation in R/FMAT.R
 \name{FMAT_load}
 \alias{FMAT_load}
-\title{Initialize running environment and (down)load language models.}
+\title{(Down)Load BERT models (useless for GPU).}
 \usage{
 FMAT_load(models)
 }
 \arguments{
-\item{models}{Language model names (usually the BERT-based models) at
-\href{https://huggingface.co/models}{HuggingFace}.
-
-For a full list of available models, see
-\url{https://huggingface.co/models?pipeline_tag=fill-mask&library=transformers}}
+\item{models}{Model names at
+\href{https://huggingface.co/models?pipeline_tag=fill-mask&library=transformers}{HuggingFace}.}
 }
 \value{
 A named list of fill-mask pipelines obtained from the models.
 The returned object \emph{cannot} be saved as any RData.
-You will need to \emph{rerun} this function if you restart the R session.
-
-All downloaded models are saved
-at your local folder "C:/Users/[YourUserName]/.cache/".
+You will need to \emph{rerun} this function if you \emph{restart} the R session.
 }
 \description{
-Initialize running environment and (down)load language models.
+Load BERT models from local cache folder "\%USERPROFILE\%/.cache/huggingface".
+Models that have not been downloaded can also
+be automatically downloaded (but \emph{silently}).
+For \href{https://psychbruce.github.io/FMAT/#guidance-for-gpu-acceleration}{GPU Acceleration},
+please directly use \code{\link{FMAT_run}} instead.
 }
 \examples{
-\donttest{models = FMAT_load(c("bert-base-uncased", "bert-base-cased"))
+\dontrun{
+model.names = c("bert-base-uncased", "bert-base-cased")
+models = FMAT_load(model.names)  # load models from cache
 }
+
 }
 \seealso{
-\code{\link[PsychWordVec:text_init]{PsychWordVec::text_init}}
+\code{\link{BERT_download}}
 
 \code{\link{FMAT_query}}
 

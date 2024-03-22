@@ -2,90 +2,98 @@
 % Please edit documentation in R/FMAT.R
 \name{FMAT_run}
 \alias{FMAT_run}
-\title{Run the fill-mask pipeline on multiple models.}
+\title{Run the fill-mask pipeline on multiple models (CPU / GPU).}
 \usage{
-FMAT_run(
-  models,
-  data,
-  file = NULL,
-  progress = c(FALSE, TRUE, "none", "text", "time"),
-  parallel = FALSE,
-  ncores = 4,
-  warning = TRUE
-)
+FMAT_run(models, data, gpu, file = NULL, progress = TRUE, warning = TRUE)
 }
 \arguments{
-\item{models}{Language model(s):
+\item{models}{Options:
 \itemize{
-  \item{Model names (usually the BERT-based models) at
-   \href{https://huggingface.co/models}{HuggingFace}.}
-  \item{A list of mask filling pipelines loaded by \code{\link{FMAT_load}}.
-
-   * You will need to \strong{rerun} \code{\link{FMAT_load}}
-   if you \strong{restart} the R session.}
+\item A character vector of model names at
+\href{https://huggingface.co/models?pipeline_tag=fill-mask&library=transformers}{HuggingFace}.
+\itemize{
+\item Can be used for both CPU and GPU.
+}
+\item A returned object from \code{\link{FMAT_load}}.
+\itemize{
+\item Can ONLY be used for CPU.
+\item If you \emph{restart} the R session,
+you will need to \emph{rerun} \code{\link{FMAT_load}}.
+}
 }}
 
-\item{data}{A data.table returned from
-\code{\link{FMAT_query}} or \code{\link{FMAT_query_bind}}.}
+\item{data}{A data.table returned from \code{\link{FMAT_query}} or \code{\link{FMAT_query_bind}}.}
+
+\item{gpu}{Use GPU (3x faster than CPU) to run the fill-mask pipeline?
+Defaults to missing value that will \emph{automatically} use available GPU
+(if not available, then use CPU).
+An NVIDIA GPU device (e.g., GeForce RTX Series) is required to use GPU.
+See \href{https://psychbruce.github.io/FMAT/#guidance-for-gpu-acceleration}{Guidance for GPU Acceleration}.
+
+Options passing to the \code{device} parameter in Python:
+\itemize{
+\item \code{FALSE}: CPU (\code{device = -1}).
+\item \code{TRUE}: GPU (\code{device = 0}).
+\item Any other value: passing to
+\href{https://huggingface.co/docs/transformers/main_classes/pipelines#transformers.pipeline.device}{transformers.pipeline(device=...)}
+which defines the device (e.g.,
+\code{"cpu"}, \code{"cuda:0"}, or a GPU device id like \code{1})
+on which the pipeline will be allocated.
+}}
 
 \item{file}{File name of \code{.RData} to save the returned data.}
 
-\item{progress}{Show a progress bar:
-\code{"none"} (\code{FALSE}), \code{"text"} (\code{TRUE}), \code{"time"}.}
+\item{progress}{Show a progress bar? Defaults to \code{TRUE}.}
 
-\item{parallel}{Parallel processing (NOT suggested).
-Defaults to \code{FALSE}.
-If \code{TRUE}, then \code{models} must be model names
-rather than from \code{\link{FMAT_load}}.
-
-* For small-scale \code{data},
-parallel processing would instead be \emph{slower}
-because it takes time to create a parallel cluster.}
-
-\item{ncores}{Number of CPU cores to be used in parallel processing.}
-
-\item{warning}{Warning of out-of-vocabulary word(s). Defaults to \code{TRUE}.}
+\item{warning}{Alert warning of out-of-vocabulary word(s)? Defaults to \code{TRUE}.}
 }
 \value{
-A data.table (of new class \code{fmat}) appending \code{data}
-with these new variables:
+A data.table (of new class \code{fmat}) appending \code{data} with these new variables:
 \itemize{
-  \item{\code{model}: model name.}
-  \item{\code{output}: complete sentence output with unmasked token.}
-  \item{\code{token}: actual token to be filled in the blank mask
-  (a note "out-of-vocabulary" will be added
-  if the original word is not found in the model vocabulary).}
-  \item{\code{prob}: (raw) conditional probability of the unmasked token
-  given the provided context, estimated by the masked language model.
-
-  * It is NOT SUGGESTED to directly interpret the raw probabilities
-  because the \emph{contrast} between a pair of probabilities
-  is more interpretable. See \code{\link{summary.fmat}}.}
+\item \code{model}: model name.
+\item \code{output}: complete sentence output with unmasked token.
+\item \code{token}: actual token to be filled in the blank mask
+(a note "out-of-vocabulary" will be added
+if the original word is not found in the model vocabulary).
+\item \code{prob}: (raw) conditional probability of the unmasked token
+given the provided context, estimated by the masked language model.
+\itemize{
+\item It is NOT SUGGESTED to directly interpret the raw probabilities
+because the \emph{contrast} between a pair of probabilities
+is more interpretable. See \code{\link{summary.fmat}}.
+}
 }
 }
 \description{
-Run the fill-mask pipeline on multiple models.
+Run the fill-mask pipeline on multiple models with CPU or GPU
+(faster but requiring an NVIDIA GPU device).
 }
 \details{
-The function will also automatically adjust for
+The function automatically adjusts for
 the compatibility of tokens used in certain models:
 (1) for uncased models (e.g., ALBERT), it turns tokens to lowercase;
-(2) for models that use \code{<mask>} rather than \code{[MASK]},
+(2) for models that use \verb{<mask>} rather than \verb{[MASK]},
 it automatically uses the corrected mask token;
 (3) for models that require a prefix to estimate whole words than subwords
 (e.g., ALBERT, RoBERTa), it adds a certain prefix (usually a white space;
 \\u2581 for ALBERT and XLM-RoBERTa, \\u0120 for RoBERTa and DistilRoBERTa).
 
 Note that these changes only affect the \code{token} variable
-in the returned data, but will not affect the \code{M_word} variable.z
-Thus, users may analyze their data based on the unchanged \code{M_word}
+in the returned data, but will not affect the \code{M_word} variable.
+Thus, users may analyze data based on the unchanged \code{M_word}
 rather than the \code{token}.
+
+Note also that there may be extremely trivial differences
+(after 5~6 significant digits) in the
+raw probability estimates between using CPU and GPU,
+but these differences would have little impact on main results.
 }
 \examples{
-# Running the example requires the models downloaded
-# You will need to rerun `FMAT_load` if you restart the R session
+## Running the examples requires the models downloaded
 
-\donttest{models = FMAT_load(c("bert-base-uncased", "bert-base-cased"))
+\dontrun{
+models = FMAT_load(c("bert-base-uncased", "bert-base-cased"))
+# for GPU acceleration, please use `FMAT_run()` directly
 
 query1 = FMAT_query(
   c("[MASK] is {TARGET}.", "[MASK] works as {TARGET}."),
@@ -118,8 +126,11 @@ data3 = FMAT_run(models, query3)
 summary(data3, attrib.pair=FALSE)
 summary(data3)
 }
+
 }
 \seealso{
+\code{\link{BERT_download}}
+
 \code{\link{FMAT_load}}
 
 \code{\link{FMAT_query}}
