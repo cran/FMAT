@@ -1,7 +1,7 @@
 Package: FMAT
 Title: The Fill-Mask Association Test
-Version: 2024.6
-Date: 2024-06-12
+Version: 2024.7
+Date: 2024-07-29
 Authors@R: 
     c(person(given = "Han-Wu-Shuang",
              family = "Bao",
@@ -11,6 +11,7 @@ Authors@R:
 Maintainer: Han-Wu-Shuang Bao <baohws@foxmail.com>
 Description: 
     The Fill-Mask Association Test ('FMAT')
+    <doi:10.1037/pspa0000396>
     is an integrative and probability-based method using
     Masked Language Models to measure conceptual associations
     (e.g., attitudes, biases, stereotypes, social norms, cultural values)
@@ -31,7 +32,7 @@ Imports: reticulate, data.table, stringr, forcats, psych, irr, glue,
 Suggests: bruceR, PsychWordVec, text, sweater, nlme
 RoxygenNote: 7.3.1
 NeedsCompilation: no
-Packaged: 2024-06-12 14:37:57 UTC; Bruce
+Packaged: 2024-07-29 12:55:58 UTC; Bruce
 Author: Han-Wu-Shuang Bao [aut, cre] (<https://orcid.org/0000-0003-3043-710X>)
 Repository: CRAN
-Date/Publication: 2024-06-12 14:50:02 UTC
+Date/Publication: 2024-07-29 13:20:02 UTC
