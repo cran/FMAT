@@ -10,6 +10,10 @@ FMAT_run(
   gpu,
   add.tokens = FALSE,
   add.method = c("sum", "mean"),
+  add.verbose = TRUE,
+  pattern.special = list(uncased = "uncased|albert|electra|muhtasham", prefix.u2581 =
+    "albert|xlm-roberta|xlnet", prefix.u2581.excl = "chinese", prefix.u0120 =
+    "roberta|bart|deberta|bertweet-large", prefix.u0120.excl = "chinese|xlm-|kornosk/"),
   file = NULL,
   progress = TRUE,
   warning = TRUE,
@@ -17,20 +21,8 @@ FMAT_run(
 )
 }
 \arguments{
-\item{models}{Options:
-\itemize{
-\item A character vector of model names at
-\href{https://huggingface.co/models?pipeline_tag=fill-mask&library=transformers}{HuggingFace}.
-\itemize{
-\item Can be used for both CPU and GPU.
-}
-\item A returned object from \code{\link{FMAT_load}}.
-\itemize{
-\item Can ONLY be used for CPU.
-\item If you \emph{restart} the R session,
-you will need to \emph{rerun} \code{\link{FMAT_load}}.
-}
-}}
+\item{models}{A character vector of model names at
+\href{https://huggingface.co/models}{HuggingFace}.}
 
 \item{data}{A data.table returned from \code{\link{FMAT_query}} or \code{\link{FMAT_query_bind}}.}
 
@@ -51,11 +43,27 @@ which defines the device (e.g.,
 on which the pipeline will be allocated.
 }}
 
-\item{add.tokens}{Add new tokens (for out-of-vocabulary words or even phrases) to model vocabulary?
-Defaults to \code{FALSE}. It only temporarily adds tokens for tasks but does not change the raw model file.}
+\item{add.tokens}{Add new tokens
+(for out-of-vocabulary words or phrases)
+to model vocabulary?
+Defaults to \code{FALSE}.
+It only temporarily adds tokens for tasks
+but does not change the raw model file.}
 
-\item{add.method}{Method used to produce the token embeddings of new added tokens.
+\item{add.method}{Method used to produce the token embeddings of newly added tokens.
 Can be \code{"sum"} (default) or \code{"mean"} of subword token embeddings.}
+
+\item{add.verbose}{Print composition information of new tokens
+(for out-of-vocabulary words or phrases)?
+Defaults to \code{TRUE}.}
+
+\item{pattern.special}{Regular expression patterns (matching model names) for special model cases that are uncased or require a special prefix character in certain situations.
+
+\strong{WARNING}: As the developer is not able to check all models, users are responsible for checking the models they would use and for modifying this argument if necessary.
+\itemize{
+\item \code{prefix.u2581}: adding prefix \verb{\\u2581} for all mask words
+\item \code{prefix.u0120}: adding prefix \verb{\\u0120} for only non-starting mask words
+}}
 
 \item{file}{File name of \code{.RData} to save the returned data.}
 
@@ -139,8 +147,6 @@ summary(data2)
 \code{\link{BERT_download}}
 
 \code{\link{BERT_vocab}}
-
-\code{\link{FMAT_load}} (deprecated)
 
 \code{\link{FMAT_query}}
 

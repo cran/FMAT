@@ -1,7 +1,7 @@
 Package: FMAT
 Title: The Fill-Mask Association Test
-Version: 2025.3
-Date: 2025-03-18
+Version: 2025.4
+Date: 2025-04-08
 Authors@R: 
     c(person(given = "Han-Wu-Shuang",
              family = "Bao",
@@ -32,7 +32,7 @@ Imports: reticulate, data.table, stringr, forcats, rvest, psych, irr,
 Suggests: bruceR, PsychWordVec, text, sweater, nlme
 RoxygenNote: 7.3.2
 NeedsCompilation: no
-Packaged: 2025-03-19 16:11:28 UTC; Bruce
+Packaged: 2025-04-08 06:36:49 UTC; Bruce
 Author: Han-Wu-Shuang Bao [aut, cre] (<https://orcid.org/0000-0003-3043-710X>)
 Repository: CRAN
-Date/Publication: 2025-03-19 16:30:02 UTC
+Date/Publication: 2025-04-08 06:50:09 UTC

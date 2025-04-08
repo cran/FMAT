@@ -2,23 +2,23 @@
 % Please edit documentation in R/FMAT.R
 \name{BERT_info_date}
 \alias{BERT_info_date}
-\title{Scrape the earliest release date of BERT models.}
+\title{Scrape the initial commit date of BERT models.}
 \usage{
 BERT_info_date(models = NULL)
 }
 \arguments{
-\item{models}{Model names at
-\href{https://huggingface.co/models?pipeline_tag=fill-mask&library=transformers}{HuggingFace}.}
+\item{models}{A character vector of model names at
+\href{https://huggingface.co/models}{HuggingFace}.}
 }
 \value{
 A data.table:
 \itemize{
 \item model name
-\item earliest date (scraped from huggingface commit history)
+\item initial commit date (scraped from huggingface commit history)
 }
 }
 \description{
-Scrape the earliest release date of BERT models.
+Scrape the initial commit date of BERT models.
 }
 \examples{
 \dontrun{
