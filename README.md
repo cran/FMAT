@@ -18,7 +18,7 @@ The *Fill-Mask Association Test* (FMAT) is an integrative and probability-based 
 
 ## Author
 
-Han-Wu-Shuang (Bruce) Bao 包寒吴霜
+Bruce H. W. S. Bao 包寒吴霜
 
 📬 [baohws\@foxmail.com](mailto:baohws@foxmail.com)
 
@@ -26,19 +26,19 @@ Han-Wu-Shuang (Bruce) Bao 包寒吴霜
 
 ## Citation
 
-### (1) FMAT Package Citation
+### (1) FMAT Package
 
--   Bao, H.-W.-S. (2023). *FMAT: The Fill-Mask Association Test*. <https://CRAN.R-project.org/package=FMAT>
-    -   *Note*: This is the original citation. Please refer to the information when you `library(FMAT)` for the APA-7 format of the version you installed.
+-   Bao, H. W. S. (2023). *FMAT: The Fill-Mask Association Test*. <https://doi.org/10.32614/CRAN.package.FMAT>
 
 ### (2) FMAT Research Articles - Methodology
 
--   Bao, H.-W.-S. (2024). The Fill-Mask Association Test (FMAT): Measuring propositions in natural language. *Journal of Personality and Social Psychology, 127*(3), 537–561. <https://doi.org/10.1037/pspa0000396>
+-   Bao, H. W. S. (2024). The Fill-Mask Association Test (FMAT): Measuring propositions in natural language. *Journal of Personality and Social Psychology, 127*(3), 537–561. <https://doi.org/10.1037/pspa0000396>
 
 ### (3) FMAT Research Articles - Application
 
--   Bao, H.-W.-S., & Gries, P. (2024). Intersectional race–gender stereotypes in natural language. *British Journal of Social Psychology, 63*(4), 1771–1786. <https://doi.org/10.1111/bjso.12748>
--   Bao, H.-W.-S., & Gries, P. (2025). Bias toward Chinese in English language use. *China Quarterly*. (accepted)
+-   Bao, H. W. S., & Gries, P. (2024). Intersectional race–gender stereotypes in natural language. *British Journal of Social Psychology, 63*(4), 1771–1786. <https://doi.org/10.1111/bjso.12748>
+-   Bao, H. W. S., & Gries, P. (2025). Biases about Chinese people in English language use: Stereotypes, prejudice and discrimination. *China Quarterly*. <https://doi.org/10.1017/S0305741025100532>
+-   Wang, Z., Xia, H., Bao, H. W. S., Jing, Y., & Gu, R. (2025). Artificial intelligence is stereotypically linked more with socially dominant groups in natural language. *Advanced Science*. <https://doi.org/10.1002/advs.202508623>
 
 ## Installation
 
@@ -91,7 +91,6 @@ pip install sentencepiece
 -   According to the May 2024 releases, "transformers" ≥ 4.41 depends on "huggingface-hub" ≥ 0.23. The suggested versions of "transformers" (4.40.2) and "huggingface-hub" (0.20.3) ensure the console display of progress bars when downloading BERT models while keeping these packages as new as possible.
 -   Proxy users may use the "global mode" (全局模式) to download models.
 -   If you find the error `HTTPSConnectionPool(host='huggingface.co', port=443)`, please try to (1) reinstall [Anaconda](https://www.anaconda.com/download/success) so that some unknown issues may be fixed, or (2) downgrade the "[urllib3](https://pypi.org/project/urllib3/)" package to version ≤ 1.25.11 (`pip install urllib3==1.25.11`) so that it will use HTTP proxies (rather than HTTPS proxies as in later versions) to connect to Hugging Face.
-    -   <https://www.cnblogs.com/xyz/p/17872452.html>
 
 ## Guidance for FMAT
 

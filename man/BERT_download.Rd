@@ -14,8 +14,7 @@ BERT_download(models = NULL, verbose = FALSE)
 Defaults to \code{FALSE}.}
 }
 \value{
-Invisibly return a data.table of
-basic file information of local models.
+Invisibly return a data.table of basic file information of local models.
 }
 \description{
 Download and save BERT models to local cache folder "\%USERPROFILE\%/.cache/huggingface".
@@ -32,9 +31,9 @@ BERT_info()  # information of all downloaded models
 
 }
 \seealso{
-\code{\link{set_cache_folder}}
+\code{\link[=set_cache_folder]{set_cache_folder()}}
 
-\code{\link{BERT_info}}
+\code{\link[=BERT_info]{BERT_info()}}
 
-\code{\link{BERT_vocab}}
+\code{\link[=BERT_vocab]{BERT_vocab()}}
 }

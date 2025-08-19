@@ -1,6 +1,10 @@
 #### Initialize ####
 
 
+#' @keywords internal
+"_PACKAGE"
+
+
 #' @import stringr
 #' @import data.table
 #' @importFrom dplyr left_join mutate
@@ -17,15 +21,14 @@
   # https://github.com/psychbruce/FMAT/issues/1
 
   inst.ver = as.character(utils::packageVersion("FMAT"))
-  pkg.date = substr(utils::packageDate("FMAT"), 1, 4)
   pkgs = c("data.table", "stringr", "forcats")
   suppressMessages({
     suppressWarnings({
       loaded = sapply(pkgs, require, character.only=TRUE)
     })
   })
-  if(all(loaded)) {
-    packageStartupMessage(glue::glue_col("
+  packageStartupMessage(
+    glue::glue_col("
 
     {magenta FMAT (v{inst.ver})}
     {blue The Fill-Mask Association Test}
@@ -37,17 +40,11 @@
     {underline https://psychbruce.github.io/FMAT}
 
     {magenta To use this package in publications, please cite:}
-    Bao, H.-W.-S. ({pkg.date}). "),
-    glue::glue_col("{italic FMAT: The Fill-Mask Association Test}"),
-    glue::glue_col(" (Version {inst.ver}) [Computer software]. "),
-    glue::glue_col("{underline https://CRAN.R-project.org/package=FMAT}"),
-    "\n\n",
-    glue::glue_col("Bao, H.-W.-S. (2024). The Fill-Mask Association Test (FMAT): "),
-    glue::glue_col("Measuring propositions in natural language. "),
-    glue::glue_col("{italic Journal of Personality and Social Psychology, 127}"),
-    glue::glue_col("(3), 537-561. {underline https://doi.org/10.1037/pspa0000396}"),
-    "\n")
-  }
+    Bao, H. W. S. (2023). {italic FMAT: The Fill-Mask Association Test} (Version {inst.ver}) [Computer software]. {underline https://doi.org/10.32614/CRAN.package.FMAT}
+
+    Bao, H. W. S. (2024). The Fill-Mask Association Test (FMAT): Measuring propositions in natural language. {italic Journal of Personality and Social Psychology, 127}(3), 537-561. {underline https://doi.org/10.1037/pspa0000396}
+
+    "))
 }
 
 
@@ -63,11 +60,13 @@
 #'
 #' @param ... Named objects (usually character vectors for this package).
 #'
-#' @return A list of named objects.
+#' @return
+#' A list of named objects.
 #'
 #' @examples
 #' .(Male=c("he", "his"), Female=c("she", "her"))
 #'
+#' @keywords internal
 #' @export
 . = function(...) list(...)
 
@@ -243,14 +242,11 @@ add_tokens = function(
 
 #' Set (change) HuggingFace cache folder temporarily.
 #'
-#' @description
-#' This function allows you to change the default cache directory (when it lacks disk capacity) to another path (e.g., your portable SSD) temporarily.
+#' This function allows you to change the default cache directory (when it lacks storage space) to another path (e.g., your portable SSD) *temporarily*.
 #'
-#' **Keep in mind**:
-#' This function takes effect only for
-#' the current R session temporarily,
-#' so you should run this each time
-#' BEFORE you use other FMAT functions in an R session.
+#' # Keep in Mind
+#'
+#' This function takes effect only for the current R session *temporarily*, so you should run this each time BEFORE you use other FMAT functions in an R session.
 #'
 #' @param path Folder path to store HuggingFace models.
 #'
@@ -342,15 +338,14 @@ check_models_downloaded = function(local.models, models) {
 #' Defaults to `FALSE`.
 #'
 #' @return
-#' Invisibly return a data.table of
-#' basic file information of local models.
+#' Invisibly return a data.table of basic file information of local models.
 #'
 #' @seealso
-#' [`set_cache_folder`]
+#' [set_cache_folder()]
 #'
-#' [`BERT_info`]
+#' [BERT_info()]
 #'
-#' [`BERT_vocab`]
+#' [BERT_vocab()]
 #'
 #' @examples
 #' \dontrun{
@@ -421,7 +416,8 @@ BERT_download = function(models=NULL, verbose=FALSE) {
 #'
 #' @param models Model names.
 #'
-#' @return `NULL`.
+#' @return
+#' `NULL`.
 #'
 #' @export
 BERT_remove = function(models) {
@@ -456,9 +452,9 @@ BERT_remove = function(models) {
 #' - \[MASK\] token
 #'
 #' @seealso
-#' [`BERT_download`]
+#' [BERT_download()]
 #'
-#' [`BERT_vocab`]
+#' [BERT_vocab()]
 #'
 #' @examples
 #' \dontrun{
@@ -620,28 +616,19 @@ get_model_date = function(model) {
 #'
 #' @inheritParams BERT_download
 #' @param mask.words Option words filling in the mask.
-#' @param add.tokens Add new tokens
-#' (for out-of-vocabulary words or phrases)
-#' to model vocabulary?
-#' Defaults to `FALSE`.
-#' It only temporarily adds tokens for tasks
-#' but does not change the raw model file.
-#' @param add.method Method used to produce the token embeddings of newly added tokens.
-#' Can be `"sum"` (default) or `"mean"` of subword token embeddings.
-#' @param add.verbose Print composition information of new tokens
-#' (for out-of-vocabulary words or phrases)?
-#' Defaults to `TRUE`.
+#' @param add.tokens Add new tokens (for out-of-vocabulary words or phrases) to model vocabulary? It only temporarily adds tokens for tasks but does not change the raw model file. Defaults to `FALSE`.
+#' @param add.method Method used to produce the token embeddings of newly added tokens. Can be `"sum"` (default) or `"mean"` of subword token embeddings.
+#' @param add.verbose Print composition information of new tokens (for out-of-vocabulary words or phrases)? Defaults to `TRUE`.
 #'
 #' @return
-#' A data.table of model name, mask word, real token (replaced if out of vocabulary),
-#' and token id (0~N).
+#' A data.table of model name, mask word, real token (replaced if out of vocabulary), and token id (0~N).
 #'
 #' @seealso
-#' [`BERT_download`]
+#' [BERT_download()]
 #'
-#' [`BERT_info`]
+#' [BERT_info()]
 #'
-#' [`FMAT_run`]
+#' [FMAT_run()]
 #'
 #' @examples
 #' \dontrun{
@@ -689,54 +676,6 @@ BERT_vocab = function(
 
 
 #### FMAT ####
-
-
-## \[Deprecated\] Load BERT models (useless for GPU).
-##
-## Load BERT models from local cache folder "%USERPROFILE%/.cache/huggingface".
-## For [GPU Acceleration](https://psychbruce.github.io/FMAT/#guidance-for-gpu-acceleration),
-## please directly use [`FMAT_run`].
-## In general, [`FMAT_run`] is always preferred than [`FMAT_load`].
-##
-## @inheritParams BERT_download
-##
-## @return
-## A named list of fill-mask pipelines obtained from the models.
-## The returned object *cannot* be saved as any RData.
-## You will need to *rerun* this function if you *restart* the R session.
-##
-## @seealso
-## [`set_cache_folder`]
-##
-## [`BERT_download`]
-##
-## [`FMAT_query`]
-##
-## [`FMAT_query_bind`]
-##
-## [`FMAT_run`]
-##
-## @examples
-## \dontrun{
-## models = c("bert-base-uncased", "bert-base-cased")
-## models = FMAT_load(models)  # load models from cache
-## }
-##
-## @export
-FMAT_load = function(models) {
-  transformers = transformers_init()
-  cache.folder = get_cache_folder(transformers)
-  cli::cli_text("Loading models from {.path {cache.folder}} ...")
-  fms = lapply(as.character(models), function(model) {
-    t0 = Sys.time()
-    fill_mask = fill_mask_init(transformers, model)
-    cli::cli_alert_success("{model} ({dtime(t0)})")
-    return(list(model.name=model, fill.mask=fill_mask))
-  })
-  names(fms) = models
-  class(fms) = "fill.mask"
-  return(fms)
-}
 
 
 fix_pair = function(X, var="MASK") {
@@ -789,7 +728,7 @@ expand_full = function(query, X) {
 
 
 map_query = function(.x, .f, ...) {
-  dq = purrr::map_df(.x, .f, ...) # .x should be query (chr vec)
+  dq = purrr::map_df(.x, .f, ...)  # .x should be query (chr vec)
   dq$query = as_factor(dq$query)
   return(dq)
 }
@@ -817,34 +756,19 @@ append_X = function(dq, X, var="TARGET") {
 
 #' Prepare a data.table of queries and variables for the FMAT.
 #'
-#' @param query Query text (should be a character string/vector
-#' with at least one `[MASK]` token).
-#' Multiple queries share the same set of
-#' `MASK`, `TARGET`, and `ATTRIB`.
-#' For multiple queries with different
-#' `MASK`, `TARGET`, and/or `ATTRIB`,
-#' please use [`FMAT_query_bind`] to combine them.
-#' @param MASK A named list of `[MASK]` target words.
-#' Must be single words in the vocabulary of a certain masked language model.
-#'
-#' For model vocabulary, see, e.g.,
-#' <https://huggingface.co/bert-base-uncased/raw/main/vocab.txt>
-#'
-#' Infrequent words may be not included in a model's vocabulary,
-#' and in this case you may insert the words into the context by
-#' specifying either `TARGET` or `ATTRIB`.
-#' @param TARGET,ATTRIB A named list of Target/Attribute words or phrases.
-#' If specified, then `query` must contain
-#' `{TARGET}` and/or `{ATTRIB}` (in all uppercase and in braces)
-#' to be replaced by the words/phrases.
+#' @param query Query text (should be a character string/vector with at least one `[MASK]` token). Multiple queries share the same set of `MASK`, `TARGET`, and `ATTRIB`. For multiple queries with different `MASK`, `TARGET`, and/or `ATTRIB`, please use [FMAT_query_bind()] to combine them.
+#' @param MASK A named list of `[MASK]` target words. Must be single words in the vocabulary of a certain masked language model.
+#' - For model vocabulary, see, e.g., <https://huggingface.co/bert-base-uncased/raw/main/vocab.txt>
+#' - Infrequent words may be not included in a model's vocabulary, and in this case you may insert the words into the context by specifying either `TARGET` or `ATTRIB`.
+#' @param TARGET,ATTRIB A named list of Target/Attribute words or phrases. If specified, then `query` must contain `{TARGET}` and/or `{ATTRIB}` (in all uppercase and in braces) to be replaced by the words/phrases.
 #'
 #' @return
 #' A data.table of queries and variables.
 #'
 #' @seealso
-#' [`FMAT_query_bind`]
+#' [FMAT_query_bind()]
 #'
-#' [`FMAT_run`]
+#' [FMAT_run()]
 #'
 #' @examples
 #' \donttest{FMAT_query("[MASK] is a nurse.", MASK = .(Male="He", Female="She"))
@@ -881,6 +805,7 @@ FMAT_query = function(
   }
 
   sapply(MASK, function(x) {
+    x = na.omit(x)
     if(anyDuplicated(x)) {
       dup = x[duplicated(x)]
       cli::cli_alert_danger("Duplicated mask words: {.val {unique(dup)}}")
@@ -935,15 +860,15 @@ FMAT_query = function(
 
 #' Combine multiple query data.tables and renumber query ids.
 #'
-#' @param ... Query data.tables returned from [`FMAT_query`].
+#' @param ... Query data.tables returned from [FMAT_query()].
 #'
 #' @return
 #' A data.table of queries and variables.
 #'
 #' @seealso
-#' [`FMAT_query`]
+#' [FMAT_query()]
 #'
-#' [`FMAT_run`]
+#' [FMAT_run()]
 #'
 #' @examples
 #' \donttest{FMAT_query_bind(
@@ -978,7 +903,7 @@ FMAT_query_bind = function(...) {
 
 #' Run the fill-mask pipeline and check the raw results.
 #'
-#' Normal users should use [`FMAT_run()`].
+#' Normal users should use [FMAT_run()].
 #' This function is only for technical check.
 #'
 #' @describeIn fill_mask Check performance of one model.
@@ -988,8 +913,7 @@ FMAT_query_bind = function(...) {
 #' @param model,models Model name(s).
 #' @param targets Target words to fill in the mask.
 #' Defaults to `NULL` (return the top 5 most likely words).
-#' @param topn Number of the most likely predictions to return.
-#' Defaults to `5`.
+#' @param topn Number of the most likely predictions to return. Defaults to `5`.
 #'
 #' @return
 #' A data.table of raw results.
@@ -1067,49 +991,25 @@ fill_mask_check = function(query, models, targets=NULL, topn=5, gpu) {
 
 #' Run the fill-mask pipeline on multiple models (CPU / GPU).
 #'
-#' Run the fill-mask pipeline on multiple models with CPU or GPU
-#' (faster but requiring an NVIDIA GPU device).
+#' Run the fill-mask pipeline on multiple models with CPU or GPU (faster but requires an NVIDIA GPU device).
 #'
-#' @details
-#' The function automatically adjusts for
-#' the compatibility of tokens used in certain models:
-#' (1) for uncased models (e.g., ALBERT), it turns tokens to lowercase;
-#' (2) for models that use `<mask>` rather than `[MASK]`,
-#' it automatically uses the corrected mask token;
-#' (3) for models that require a prefix to estimate whole words than subwords
-#' (e.g., ALBERT, RoBERTa), it adds a certain prefix (usually a white space;
-#' \\u2581 for ALBERT and XLM-RoBERTa, \\u0120 for RoBERTa and DistilRoBERTa).
+#' The function automatically adjusts for the compatibility of tokens used in certain models: (1) for uncased models (e.g., ALBERT), it turns tokens to lowercase; (2) for models that use `<mask>` rather than `[MASK]`, it automatically uses the corrected mask token; (3) for models that require a prefix to estimate whole words than subwords (e.g., ALBERT, RoBERTa), it adds a certain prefix (usually a white space; \\u2581 for ALBERT and XLM-RoBERTa, \\u0120 for RoBERTa and DistilRoBERTa).
 #'
-#' Note that these changes only affect the `token` variable
-#' in the returned data, but will not affect the `M_word` variable.
-#' Thus, users may analyze data based on the unchanged `M_word`
-#' rather than the `token`.
+#' These changes only affect the `token` variable in the returned data, but will not affect the `M_word` variable. Thus, users may analyze data based on the unchanged `M_word` rather than the `token`.
 #'
-#' Note also that there may be extremely trivial differences
-#' (after 5~6 significant digits) in the
-#' raw probability estimates between using CPU and GPU,
-#' but these differences would have little impact on main results.
+#' Note also that there may be extremely trivial differences (after 5~6 significant digits) in the raw probability estimates between using CPU and GPU, but these differences would have little impact on main results.
 #'
 #' @inheritParams BERT_vocab
-#' @param data A data.table returned from [`FMAT_query`] or [`FMAT_query_bind`].
-#' @param gpu Use GPU (3x faster than CPU) to run the fill-mask pipeline?
-#' Defaults to missing value that will *automatically* use available GPU
-#' (if not available, then use CPU).
-#' An NVIDIA GPU device (e.g., GeForce RTX Series) is required to use GPU.
-#' See [Guidance for GPU Acceleration](https://psychbruce.github.io/FMAT/#guidance-for-gpu-acceleration).
+#' @param data A data.table returned from [FMAT_query()] or [FMAT_query_bind()].
+#' @param gpu Use GPU (3x faster than CPU) to run the fill-mask pipeline? Defaults to missing value that will *automatically* use available GPU (if not available, then use CPU). An NVIDIA GPU device (e.g., GeForce RTX Series) is required to use GPU. See [Guidance for GPU Acceleration](https://psychbruce.github.io/FMAT/#guidance-for-gpu-acceleration).
 #'
-#' Options passing to the `device` parameter in Python:
+#' Options passing on to the `device` parameter in Python:
 #' - `FALSE`: CPU (`device = -1`).
 #' - `TRUE`: GPU (`device = 0`).
-#' - Any other value: passing to
-#'   [transformers.pipeline(device=...)](https://huggingface.co/docs/transformers/main_classes/pipelines#transformers.pipeline.device)
-#'   which defines the device (e.g.,
-#'   `"cpu"`, `"cuda:0"`, or a GPU device id like `1`)
-#'   on which the pipeline will be allocated.
+#' - Others: passing on to [`transformers.pipeline(device=...)`](https://huggingface.co/docs/transformers/main_classes/pipelines#transformers.pipeline.device) which defines the device (e.g., `"cpu"`, `"cuda:0"`, or a GPU device id like `1`) on which the pipeline will be allocated.
 #' @param pattern.special Regular expression patterns (matching model names) for special model cases that are uncased or require a special prefix character in certain situations.
 #'
 #' **WARNING**: As the developer is not able to check all models, users are responsible for checking the models they would use and for modifying this argument if necessary.
-#'
 #' - `prefix.u2581`: adding prefix `\u2581` for all mask words
 #' - `prefix.u0120`: adding prefix `\u0120` for only non-starting mask words
 #' @param file File name of `.RData` to save the returned data.
@@ -1118,30 +1018,27 @@ fill_mask_check = function(query, models, targets=NULL, topn=5, gpu) {
 #' @param na.out Replace probabilities of out-of-vocabulary word(s) with `NA`? Defaults to `TRUE`.
 #'
 #' @return
-#' A data.table (of new class `fmat`) appending `data` with these new variables:
+#' A data.table (class `fmat`) appending `data` with these new variables:
 #' - `model`: model name.
 #' - `output`: complete sentence output with unmasked token.
 #' - `token`: actual token to be filled in the blank mask
 #'   (a note "out-of-vocabulary" will be added
 #'   if the original word is not found in the model vocabulary).
-#' - `prob`: (raw) conditional probability of the unmasked token
-#'   given the provided context, estimated by the masked language model.
-#'   - It is NOT SUGGESTED to directly interpret the raw probabilities
-#'   because the *contrast* between a pair of probabilities
-#'   is more interpretable. See [`summary.fmat`].
+#' - `prob`: (raw) conditional probability of the unmasked token given the provided context, estimated by the masked language model.
+#'   - It is *NOT SUGGESTED* to directly interpret the raw probabilities because the *contrast* between a pair of probabilities is more interpretable. See [summary.fmat()].
 #'
 #' @seealso
-#' [`set_cache_folder`]
+#' [set_cache_folder()]
 #'
-#' [`BERT_download`]
+#' [BERT_download()]
 #'
-#' [`BERT_vocab`]
+#' [BERT_vocab()]
 #'
-#' [`FMAT_query`]
+#' [FMAT_query()]
 #'
-#' [`FMAT_query_bind`]
+#' [FMAT_query_bind()]
 #'
-#' [`summary.fmat`]
+#' [summary.fmat()]
 #'
 #' @examples
 #' ## Running the examples requires the models downloaded
@@ -1346,32 +1243,22 @@ warning_oov = function(data) {
 
 #' \[S3 method\] Summarize the results for the FMAT.
 #'
-#' @description
-#' Summarize the results of *Log Probability Ratio* (LPR),
-#' which indicates the *relative* (vs. *absolute*)
-#' association between concepts.
+#' Summarize the results of *Log Probability Ratio* (LPR), which indicates the *relative* (vs. *absolute*) association between concepts.
 #'
-#' The LPR of just one contrast (e.g., only between a pair of attributes)
-#' may *not* be sufficient for a proper interpretation of the results,
-#' and may further require a second contrast (e.g., between a pair of targets).
+#' The LPR of just one contrast (e.g., only between a pair of attributes) may *not* be sufficient for a proper interpretation of the results, and may further require a second contrast (e.g., between a pair of targets).
 #'
-#' Users are suggested to use linear mixed models
-#' (with the R packages `nlme` or `lme4`/`lmerTest`)
-#' to perform the formal analyses and hypothesis tests based on the LPR.
+#' Users are suggested to use linear mixed models (with the R packages `nlme` or `lme4`/`lmerTest`) to perform the formal analyses and hypothesis tests based on the LPR.
 #'
 #' @inheritParams FMAT_run
-#' @param object A data.table (of new class `fmat`)
-#' returned from [`FMAT_run`].
-#' @param mask.pair,target.pair,attrib.pair Pairwise contrast of
-#' `[MASK]`, `TARGET`, `ATTRIB`?
-#' Defaults to `TRUE`.
+#' @param object A data.table (class `fmat`) returned from [FMAT_run()].
+#' @param mask.pair,target.pair,attrib.pair Pairwise contrast of `[MASK]`, `TARGET`, `ATTRIB`? Defaults to `TRUE`.
 #' @param ... Other arguments (currently not used).
 #'
 #' @return
 #' A data.table of the summarized results with Log Probability Ratio (LPR).
 #'
 #' @seealso
-#' [`FMAT_run`]
+#' [FMAT_run()]
 #'
 #' @examples
 #' # see examples in `FMAT_run`
@@ -1481,15 +1368,14 @@ summary.fmat = function(
 
 #' Intraclass correlation coefficient (ICC) of BERT models.
 #'
-#' Interrater agreement of log probabilities (treated as "ratings"/rows)
-#' among BERT language models (treated as "raters"/columns),
-#' with both row and column as ("two-way") random effects.
+#' Interrater agreement of log probabilities (treated as "ratings"/rows) among BERT language models (treated as "raters"/columns), with both row and column as ("two-way") random effects.
 #'
-#' @param data Raw data returned from [`FMAT_run`].
+#' @param data Raw data returned from [FMAT_run()].
 #' @param type Interrater `"agreement"` (default) or `"consistency"`.
 #' @param unit Reliability of `"average"` scores (default) or `"single"` scores.
 #'
-#' @return A data.table of ICC.
+#' @return
+#' A data.table of ICC.
 #'
 #' @export
 ICC_models = function(data, type="agreement", unit="average") {
@@ -1513,14 +1399,12 @@ ICC_models = function(data, type="agreement", unit="average") {
 
 #' Reliability analysis (Cronbach's \eqn{\alpha}) of LPR.
 #'
-#' @param fmat A data.table returned from [`summary.fmat`].
-#' @param item Reliability of multiple `"query"` (default),
-#' `"T_word"`, or `"A_word"`.
-#' @param by Variable(s) to split data by.
-#' Options can be `"model"`, `"TARGET"`, `"ATTRIB"`,
-#' or any combination of them.
+#' @param fmat A data.table returned from [summary.fmat()].
+#' @param item Reliability of multiple `"query"` (default), `"T_word"`, or `"A_word"`.
+#' @param by Variable(s) to split data by. Options can be `"model"`, `"TARGET"`, `"ATTRIB"`, or any combination of them.
 #'
-#' @return A data.table of Cronbach's \eqn{\alpha}.
+#' @return
+#' A data.table of Cronbach's \eqn{\alpha}.
 #'
 #' @export
 LPR_reliability = function(
