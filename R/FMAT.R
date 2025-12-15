@@ -125,10 +125,11 @@ transformers_init = function(print.info=TRUE) {
   torch.ver = torch$`__version__`
   torch.cuda = torch$cuda$is_available()
   if(torch.cuda) {
-    cuda.ver = torch$cuda_version
+    # cuda.ver = torch$cuda_version
+    # new torch: AttributeError: module 'torch' has no attribute 'cuda_version'
     gpu.info = paste("GPU (Device):", paste(torch$cuda$get_device_name(), collapse=", "))
   } else {
-    cuda.ver = "NULL"
+    # cuda.ver = "NULL"
     gpu.info = "To use GPU, see https://psychbruce.github.io/FMAT/#guidance-for-gpu-acceleration"
   }
 
@@ -138,8 +139,8 @@ transformers_init = function(print.info=TRUE) {
   hf = reticulate::import("huggingface_hub")
   hfh.ver = hf$`__version__`
 
-  urllib = reticulate::import("urllib3")
-  url.ver = urllib$`__version__`
+  # urllib = reticulate::import("urllib3")
+  # url.ver = urllib$`__version__`
 
   if(print.info) {
     cli::cli_alert_info(cli::col_blue("Device Info:
@@ -151,12 +152,10 @@ transformers_init = function(print.info=TRUE) {
     Python Packages:
     transformers  {tf.ver}
     torch         {torch.ver}
-    urllib3       {url.ver}
     huggingface-hub  {hfh.ver}
 
     NVIDIA GPU CUDA Support:
     CUDA Enabled: {torch.cuda}
-    CUDA Version: {cuda.ver}
     {gpu.info}
     "))
   }
@@ -185,7 +184,7 @@ fill_mask_init = function(transformers, model, device=-1L) {
 
 add_tokens = function(
     fill_mask, tokens,
-    method = c("sum", "mean"),
+    method = c("mean", "sum"),
     verbose.in = TRUE,
     verbose.out = TRUE
 ) {
@@ -248,7 +247,7 @@ add_tokens = function(
 #'
 #' This function takes effect only for the current R session *temporarily*, so you should run this each time BEFORE you use other FMAT functions in an R session.
 #'
-#' @param path Folder path to store HuggingFace models.
+#' @param path Folder path to store HuggingFace models. If `NULL`, then return the current cache folder.
 #'
 #' @examples
 #' \dontrun{
@@ -262,23 +261,29 @@ add_tokens = function(
 #' }
 #'
 #' @export
-set_cache_folder = function(path) {
-  if(!dir.exists(path)) dir.create(path)
-  if(!dir.exists(path)) stop("No such directory.", call.=FALSE)
-
-  # os = reticulate::import("os")
-  # os$environ["HF_HOME"] = path
-  Sys.setenv("HF_HOME" = path)
+set_cache_folder = function(path=NULL) {
+  if(!is.null(path)) {
+    if(!dir.exists(path)) dir.create(path)
+    if(!dir.exists(path)) stop("No such directory.", call.=FALSE)
+    # os = reticulate::import("os")
+    # os$environ["HF_HOME"] = path
+    Sys.setenv("HF_HOME" = path)
+  }
 
   transformers = transformers_init(print.info=FALSE)
   cache.folder = get_cache_folder(transformers)
-  if(dirname(cache.folder) != str_remove(path, "/$")) {
-    cli::cli_alert_danger("Cannot change cache folder in this R session!")
-    stop("Please restart R and run `set_cache_folder()` before other FMAT functions!", call.=FALSE)
-  }
 
-  cli::cli_alert_success("Changed HuggingFace cache folder temporarily to {.path {path}}")
-  cli::cli_alert_success("Models would be downloaded or could be moved to {.path {paste0(path, 'hub/')}}")
+  if(!is.null(path)) {
+    if(dirname(cache.folder) != str_remove(path, "/$")) {
+      cli::cli_alert_danger("Cannot change cache folder in this R session!")
+      stop("Please restart R and run `set_cache_folder()` before other FMAT functions!", call.=FALSE)
+    }
+
+    cli::cli_alert_success("Changed HuggingFace cache folder temporarily to {.path {path}}")
+    cli::cli_alert_success("Models would be downloaded or could be moved to {.path {paste0(path, 'hub/')}}")
+  } else {
+    cli::cli_alert_warning("Current HuggingFace cache folder is {.path {cache.folder}}")
+  }
 }
 
 
@@ -617,7 +622,7 @@ get_model_date = function(model) {
 #' @inheritParams BERT_download
 #' @param mask.words Option words filling in the mask.
 #' @param add.tokens Add new tokens (for out-of-vocabulary words or phrases) to model vocabulary? It only temporarily adds tokens for tasks but does not change the raw model file. Defaults to `FALSE`.
-#' @param add.method Method used to produce the token embeddings of newly added tokens. Can be `"sum"` (default) or `"mean"` of subword token embeddings.
+#' @param add.method Method used to produce the token embeddings of appended tokens. Can be `"mean"` (default) or `"sum"` of subword token embeddings.
 #' @param add.verbose Print composition information of new tokens (for out-of-vocabulary words or phrases)? Defaults to `TRUE`.
 #'
 #' @return
@@ -649,23 +654,31 @@ get_model_date = function(model) {
 BERT_vocab = function(
     models, mask.words,
     add.tokens = FALSE,
-    add.method = c("sum", "mean"),
+    add.method = c("mean", "sum"),
     add.verbose = TRUE
 ) {
   transformers = transformers_init(print.info=FALSE)
   mask.words = as.character(mask.words)
 
   maps = rbindlist(lapply(as.character(models), function(model) {
-    fill_mask = fill_mask_init(transformers, model)
-    if(add.tokens) fill_mask = add_tokens(fill_mask, mask.words, add.method, verbose.in=FALSE, verbose.out=add.verbose)
-    vocab = fill_mask$tokenizer$get_vocab()
-    ids = vocab[mask.words]
-    map = rbindlist(lapply(mask.words, function(mask) {
-      id = as.integer(fill_mask$get_target_ids(mask))
-      token = names(vocab[vocab==id])
-      if(is.null(ids[[mask]])) token = paste(token, "(out-of-vocabulary)")
-      data.table(model=as_factor(model), M_word=as_factor(mask), token=token, token.id=id)
-    }))
+    try({
+      map = NULL
+      if(add.tokens) {
+        cli::cli_alert("{.val {model}} add tokens...")
+      }
+      fill_mask = fill_mask_init(transformers, model)
+      if(add.tokens) {
+        fill_mask = add_tokens(fill_mask, mask.words, add.method, verbose.in=FALSE, verbose.out=add.verbose)
+      }
+      vocab = fill_mask$tokenizer$get_vocab()
+      ids = vocab[mask.words]
+      map = rbindlist(lapply(mask.words, function(mask) {
+        id = as.integer(fill_mask$get_target_ids(mask))
+        token = names(vocab[vocab==id])
+        if(is.null(ids[[mask]])) token = paste(token, "(out-of-vocabulary)")
+        data.table(model=as_factor(model), M_word=as_factor(mask), token=token, token.id=id)
+      }))
+    })
     return(map)
   }))
 
@@ -976,10 +989,11 @@ fill_mask_check = function(query, models, targets=NULL, topn=5, gpu) {
 
   dt = data.table()
   for(model in as.character(models)) {
-    # cli::cli_progress_step("Loading {.val {model}}")
     try({
+      t0 = Sys.time()
       di = fill_mask(query, model, targets, topn, gpu)
       dt = rbind(dt, di)
+      cli::cli_alert("------- ({dtime(t0)})")
     })
     cli::cli_progress_update()
   }
@@ -1072,13 +1086,13 @@ FMAT_run = function(
     data,
     gpu,
     add.tokens = FALSE,
-    add.method = c("sum", "mean"),
+    add.method = c("mean", "sum"),
     add.verbose = TRUE,
     pattern.special = list(
       uncased = "uncased|albert|electra|muhtasham",
       prefix.u2581 = "albert|xlm-roberta|xlnet",
       prefix.u2581.excl = "chinese",
-      prefix.u0120 = "roberta|bart|deberta|bertweet-large",
+      prefix.u0120 = "roberta|bart|deberta|bertweet-large|ModernBERT",
       prefix.u0120.excl = "chinese|xlm-|kornosk/"
     ),
     file = NULL,
@@ -1210,7 +1224,7 @@ FMAT_run = function(
   attr(data, "type") = type
   class(data) = c("fmat", class(data))
   gc()
-  cli::cli_alert_success("Task completed ({dtime(t0)})")
+  cli::cli_alert_success("Task completed: {length(models)} models ({dtime(t0)})")
 
   if(warning) warning_oov(data)
   if(na.out) data[str_detect(token, "out-of-vocabulary")]$prob = NA

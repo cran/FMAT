@@ -34,15 +34,15 @@ Bruce H. W. S. Bao 包寒吴霜
 
 -   Bao, H. W. S. (2024). The Fill-Mask Association Test (FMAT): Measuring propositions in natural language. *Journal of Personality and Social Psychology, 127*(3), 537–561. <https://doi.org/10.1037/pspa0000396>
 
-### (3) FMAT Research Articles - Application
+### (3) FMAT Research Articles - Applications
 
 -   Bao, H. W. S., & Gries, P. (2024). Intersectional race–gender stereotypes in natural language. *British Journal of Social Psychology, 63*(4), 1771–1786. <https://doi.org/10.1111/bjso.12748>
--   Bao, H. W. S., & Gries, P. (2025). Biases about Chinese people in English language use: Stereotypes, prejudice and discrimination. *China Quarterly*. <https://doi.org/10.1017/S0305741025100532>
--   Wang, Z., Xia, H., Bao, H. W. S., Jing, Y., & Gu, R. (2025). Artificial intelligence is stereotypically linked more with socially dominant groups in natural language. *Advanced Science*. <https://doi.org/10.1002/advs.202508623>
+-   Bao, H. W. S., & Gries, P. (2025). Biases about Chinese people in English language use: Stereotypes, prejudice and discrimination. *China Quarterly, 263*, 830–842. <https://doi.org/10.1017/S0305741025100532>
+-   Wang, Z., Xia, H., Bao, H. W. S., Jing, Y., & Gu, R. (2025). Artificial intelligence is stereotypically linked more with socially dominant groups in natural language. *Advanced Science, 12*(39), e08623. <https://doi.org/10.1002/advs.202508623>
 
 ## Installation
 
-The R package `FMAT` and three Python packages (`transformers`, `torch`, `huggingface-hub`) all need to be installed.
+Besides the R package `FMAT`, you also need to have a Python environment and install three Python packages (`transformers`, `huggingface-hub`, and `torch`).
 
 ### (1) R Package
 
@@ -57,21 +57,54 @@ devtools::install_github("psychbruce/FMAT", force=TRUE)
 
 ### (2) Python Environment and Packages
 
-Install [Anaconda](https://www.anaconda.com/download/success) (a recommended package manager that automatically installs Python, its IDEs like Spyder, and a large list of common Python packages).
+Install [Anaconda](https://www.anaconda.com/download/success) (an environment/package manager that automatically installs Python, its IDEs like Spyder, and a large list of common Python packages).
 
-Specify the Anaconda's Python interpreter in RStudio.
+Set RStudio to "Run as Administrator" to enable `pip` command in Terminal.
+
+> RStudio (find "rstudio.exe" in its installation path)\
+> → File Properties → Compatibility → Settings\
+> → Tick **"Run this program as an administrator"**
+
+Open RStudio and specify the Anaconda's Python interpreter.
 
 > RStudio → Tools → Global/Project Options\
 > → Python → Select → **Conda Environments**\
 > → Choose **".../Anaconda3/python.exe"**
 
-Install specific versions of Python packages "[transformers](https://pypi.org/project/transformers/#history)", "[torch](https://pypi.org/project/torch/#history)", and "[huggingface-hub](https://pypi.org/project/huggingface-hub/#history)".\
-(RStudio Terminal / Anaconda Prompt / Windows Command)
+Check Python packages installed and versions:\
+(with **Terminal** in RStudio or **Command Prompt** on Windows system)
+
+```         
+pip list
+```
+
+Install Python packages "[transformers](https://pypi.org/project/transformers/#history)", "[huggingface-hub](https://pypi.org/project/huggingface-hub/#history)", and "[torch](https://pypi.org/project/torch/#history)".
+
+You may install either the latest versions (with better support for modern models) or specific versions (with downloading progress bars).
+
+#### Option 1: Install Latest Versions (with Better Support for Modern Models)
 
 For CPU users:
 
 ```         
-pip install transformers==4.40.2 torch==2.2.1 huggingface-hub==0.20.3
+pip install transformers huggingface-hub torch
+```
+
+For GPU (CUDA) users:
+
+```         
+pip install transformers huggingface-hub
+pip install torch --index-url https://download.pytorch.org/whl/cu130
+```
+
+-   See [Guidance for GPU Acceleration] if you have an NVIDIA GPU device on your PC and would use GPU to accelerate the pipeline. See also [PyTorch Build Command](https://pytorch.org/get-started/locally/) and install [CUDA Toolkit 13.0](https://developer.nvidia.com/cuda-13-0-0-download-archive).
+
+#### Option 2: Install Specific Versions (with Downloading Progress Bars)
+
+For CPU users:
+
+```         
+pip install transformers==4.40.2 huggingface-hub==0.20.3 torch==2.2.1
 ```
 
 For GPU (CUDA) users:
@@ -81,14 +114,7 @@ pip install transformers==4.40.2 huggingface-hub==0.20.3
 pip install torch==2.2.1 --index-url https://download.pytorch.org/whl/cu121
 ```
 
-To use some models (e.g., `microsoft/deberta-v3-base`), "You need to have sentencepiece installed to convert a slow tokenizer to a fast one":
-
-```         
-pip install sentencepiece
-```
-
--   See [Guidance for GPU Acceleration] for installation guidance if you have an NVIDIA GPU device on your PC and want to use GPU to accelerate the pipeline.
--   According to the May 2024 releases, "transformers" ≥ 4.41 depends on "huggingface-hub" ≥ 0.23. The suggested versions of "transformers" (4.40.2) and "huggingface-hub" (0.20.3) ensure the console display of progress bars when downloading BERT models while keeping these packages as new as possible.
+-   According to the May 2024 releases, "transformers" ≥ 4.41 depends on "huggingface-hub" ≥ 0.23. The "transformers" (4.40.2) and "huggingface-hub" (0.20.3) can display progress bars when downloading BERT models.
 -   Proxy users may use the "global mode" (全局模式) to download models.
 -   If you find the error `HTTPSConnectionPool(host='huggingface.co', port=443)`, please try to (1) reinstall [Anaconda](https://www.anaconda.com/download/success) so that some unknown issues may be fixed, or (2) downgrade the "[urllib3](https://pypi.org/project/urllib3/)" package to version ≤ 1.25.11 (`pip install urllib3==1.25.11`) so that it will use HTTP proxies (rather than HTTPS proxies as in later versions) to connect to Hugging Face.
 
@@ -96,7 +122,9 @@ pip install sentencepiece
 
 ### Step 1: Download BERT Models
 
-Use `BERT_download()` to download [BERT models]. Model files are saved in your local cache folder "%USERPROFILE%/.cache/huggingface". A full list of BERT models are available at [Hugging Face](https://huggingface.co/models?pipeline_tag=fill-mask).
+Use `set_cache_folder()` to change the default HuggingFace cache directory from "%USERPROFILE%/.cache/huggingface/hub" to another folder you like, so that all models would be downloaded and saved in that folder. Keep in mind: This function takes effect only for the current R session *temporarily*, so you should run this each time BEFORE you use other FMAT functions in an R session.
+
+Use `BERT_download()` to download [BERT models]. A full list of BERT models are available at [Hugging Face](https://huggingface.co/models?pipeline_tag=fill-mask).
 
 Use `BERT_info()` and `BERT_vocab()` to obtain detailed information of BERT models.
 
@@ -117,12 +145,12 @@ Several steps of preprocessing have been included in the function for easier use
 
 ### Notes
 
--   Improvements are ongoing, especially for adaptation to more diverse (less popular) BERT models.
--   If you find bugs or have problems using the functions, please report them at [GitHub Issues](https://github.com/psychbruce/FMAT/issues) or send me an email.
+-   Improvements are ongoing, especially for more diverse (less popular) BERT models.
+-   If you have problems using the functions, please report at [GitHub Issues](https://github.com/psychbruce/FMAT/issues).
 
 ## Guidance for GPU Acceleration
 
-By default, the `FMAT` package uses CPU to enable the functionality for all users. But for advanced users who want to accelerate the pipeline with GPU, the `FMAT_run()` function now supports using a GPU device, about **3x faster** than CPU.
+By default, the `FMAT` package uses CPU to enable the functionality for all users. But for advanced users who want to accelerate the pipeline with GPU, the `FMAT_run()` function supports using a GPU device.
 
 Test results (on the developer's computer, depending on BERT model size):
 
@@ -135,19 +163,14 @@ Checklist:
 2.  Install PyTorch (Python `torch` package) with CUDA support.
     -   Find guidance for installation command at <https://pytorch.org/get-started/locally/>.
     -   CUDA is available only on Windows and Linux, but not on MacOS.
-    -   If you have installed a version of `torch` without CUDA support, please first uninstall it (command: `pip uninstall torch`) and then install the suggested one.
+    -   If you have installed a version of `torch` without CUDA support, please first uninstall it (command: `pip uninstall torch`).
     -   You may also install the corresponding version of CUDA Toolkit (e.g., for the `torch` version supporting CUDA 12.1, the same version of [CUDA Toolkit 12.1](https://developer.nvidia.com/cuda-12-1-0-download-archive) may also be installed).
-
-Example code for installing PyTorch with CUDA support:\
-(RStudio Terminal / Anaconda Prompt / Windows Command)
-
-```         
-pip install torch==2.2.1 --index-url https://download.pytorch.org/whl/cu121
-```
 
 ## BERT Models
 
-The reliability and validity of the following 12 BERT models in the FMAT have been established in our research, but future work is needed to examine the performance of other models.
+### Classic 12 English Models
+
+The reliability and validity of the following 12 English BERT models for the FMAT have been established in our earlier research.
 
 (model name on Hugging Face - model file size)
 
@@ -383,6 +406,219 @@ BERT_info(models)
 ```
 
 (Tested 2024-05-16 on the developer's computer: HP Probook 450 G10 Notebook PC)
+
+### General 30 English and 30 Chinese Models
+
+We are using a more comprehensive list of 30 English BERT models and 30 Chinese BERT models in our ongoing and future projects.
+
+``` r
+library(FMAT)
+set_cache_folder("G:/HuggingFace_Cache/")  # models saved in my portable SSD
+
+## 30 English Models
+models.en = c(
+  # BERT (base/large/large-wwm, uncased/cased)
+  "bert-base-uncased",
+  "bert-base-cased",
+  "bert-large-uncased",
+  "bert-large-cased",
+  "bert-large-uncased-whole-word-masking",
+  "bert-large-cased-whole-word-masking",
+  # ALBERT (base/large/xlarge, v1/v2)
+  "albert-base-v1",
+  "albert-base-v2",
+  "albert-large-v1",
+  "albert-large-v2",
+  "albert-xlarge-v1",
+  "albert-xlarge-v2",
+  # DistilBERT (uncased/cased/distilroberta)
+  "distilbert-base-uncased",
+  "distilbert-base-cased",
+  "distilroberta-base",
+  # RoBERTa (roberta/muppet, base/large)
+  "roberta-base",
+  "roberta-large",
+  "facebook/muppet-roberta-base",
+  "facebook/muppet-roberta-large",
+  # ELECTRA (base/large)
+  "google/electra-base-generator",
+  "google/electra-large-generator",
+  # MobileBERT (uncased)
+  "google/mobilebert-uncased",
+  # ModernBERT (base/large)
+  "answerdotai/ModernBERT-base",   # transformers >= 4.48.0
+  "answerdotai/ModernBERT-large",  # transformers >= 4.48.0
+  # [Tweets] (BERT/RoBERTa/BERTweet-base/BERTweet-large)
+  "muhtasham/base-mlm-tweet",
+  "cardiffnlp/twitter-roberta-base",
+  "vinai/bertweet-base",
+  "vinai/bertweet-large",
+  # [PubMed Abstracts] (BiomedBERT, base/large)
+  "microsoft/BiomedNLP-BiomedBERT-base-uncased-abstract",
+  "microsoft/BiomedNLP-BiomedBERT-large-uncased-abstract"
+)
+
+## 30 Chinese Models
+models.cn = c(
+  # BERT [Google]
+  "bert-base-chinese",
+  # BERT [Alibaba-PAI] (base/ck-base/ck-large/ck-huge)
+  "alibaba-pai/pai-bert-base-zh",
+  "alibaba-pai/pai-ckbert-base-zh",
+  "alibaba-pai/pai-ckbert-large-zh",
+  "alibaba-pai/pai-ckbert-huge-zh",
+  # BERT [HFL] (wwm, bert-wiki/bert-ext/roberta-ext)
+  "hfl/chinese-bert-wwm",
+  "hfl/chinese-bert-wwm-ext",
+  "hfl/chinese-roberta-wwm-ext",
+  # BERT [HFL] (lert/macbert/electra, base/large)
+  "hfl/chinese-lert-base",
+  "hfl/chinese-lert-large",
+  "hfl/chinese-macbert-base",
+  "hfl/chinese-macbert-large",
+  "hfl/chinese-electra-180g-base-generator",
+  "hfl/chinese-electra-180g-large-generator",
+  # RoBERTa [UER] (H=512/768, L=6/8/10/12)
+  "uer/chinese_roberta_L-6_H-512",
+  "uer/chinese_roberta_L-8_H-512",
+  "uer/chinese_roberta_L-10_H-512",
+  "uer/chinese_roberta_L-12_H-512",
+  "uer/chinese_roberta_L-6_H-768",
+  "uer/chinese_roberta_L-8_H-768",
+  "uer/chinese_roberta_L-10_H-768",
+  "uer/chinese_roberta_L-12_H-768",
+  # RoBERTa [UER] (wwm, base/large)
+  "uer/roberta-base-wwm-chinese-cluecorpussmall",
+  "uer/roberta-large-wwm-chinese-cluecorpussmall",
+  # BERT [IDEA-CCNL] (MacBERT/TCBert-base/TCBert-large)
+  "IDEA-CCNL/Erlangshen-MacBERT-325M-NLI-Chinese",
+  "IDEA-CCNL/Erlangshen-TCBert-330M-Classification-Chinese",
+  "IDEA-CCNL/Erlangshen-TCBert-330M-Sentence-Embedding-Chinese",
+  # RoBERTa [IDEA-CCNL] (UniMC, base/large)
+  "IDEA-CCNL/Erlangshen-UniMC-RoBERTa-110M-Chinese",
+  "IDEA-CCNL/Erlangshen-UniMC-RoBERTa-330M-Chinese",
+  # MegatronBERT [IDEA-CCNL] (huge)
+  "IDEA-CCNL/Erlangshen-UniMC-MegatronBERT-1.3B-Chinese"
+)
+
+BERT_info(models.en)
+BERT_info(models.cn)
+```
+
+#### Information of the 30 English Models
+
+```         
+                                                    model       type     param vocab embed layer heads   mask
+                                                   <fctr>     <fctr>     <int> <int> <int> <int> <int> <fctr>
+ 1:                                     bert-base-uncased       bert 109482240 30522   768    12    12 [MASK]
+ 2:                                       bert-base-cased       bert 108310272 28996   768    12    12 [MASK]
+ 3:                                    bert-large-uncased       bert 335141888 30522  1024    24    16 [MASK]
+ 4:                                      bert-large-cased       bert 333579264 28996  1024    24    16 [MASK]
+ 5:                 bert-large-uncased-whole-word-masking       bert 335141888 30522  1024    24    16 [MASK]
+ 6:                   bert-large-cased-whole-word-masking       bert 333579264 28996  1024    24    16 [MASK]
+ 7:                                        albert-base-v1     albert  11683584 30000   128    12    12 [MASK]
+ 8:                                        albert-base-v2     albert  11683584 30000   128    12    12 [MASK]
+ 9:                                       albert-large-v1     albert  17683968 30000   128    24    16 [MASK]
+10:                                       albert-large-v2     albert  17683968 30000   128    24    16 [MASK]
+11:                                      albert-xlarge-v1     albert  58724864 30000   128    24    16 [MASK]
+12:                                      albert-xlarge-v2     albert  58724864 30000   128    24    16 [MASK]
+13:                               distilbert-base-uncased distilbert  66362880 30522   768     6    12 [MASK]
+14:                                 distilbert-base-cased distilbert  65190912 28996   768     6    12 [MASK]
+15:                                    distilroberta-base    roberta  82118400 50265   768     6    12 <mask>
+16:                                          roberta-base    roberta 124645632 50265   768    12    12 <mask>
+17:                                         roberta-large    roberta 355359744 50265  1024    24    16 <mask>
+18:                          facebook/muppet-roberta-base    roberta 124645632 50265   768    12    12 <mask>
+19:                         facebook/muppet-roberta-large    roberta 355359744 50265  1024    24    16 <mask>
+20:                         google/electra-base-generator    electra  33511168 30522   768    12     4 [MASK]
+21:                        google/electra-large-generator    electra  50999552 30522  1024    24     4 [MASK]
+22:                             google/mobilebert-uncased mobilebert  24581888 30522   128    24     4 [MASK]
+23:                           answerdotai/ModernBERT-base modernbert 149014272 50368   768    22    12 [MASK]
+24:                          answerdotai/ModernBERT-large modernbert 394781696 50368  1024    28    16 [MASK]
+25:                              muhtasham/base-mlm-tweet       bert 109482240 30522   768    12    12 [MASK]
+26:                       cardiffnlp/twitter-roberta-base    roberta 124645632 50265   768    12    12 <mask>
+27:                                   vinai/bertweet-base    roberta 134899968 64001   768    12    12 <mask>
+28:                                  vinai/bertweet-large    roberta 355359744 50265  1024    24    16 <mask>
+29:  microsoft/BiomedNLP-BiomedBERT-base-uncased-abstract       bert 109482240 30522   768    12    12 [MASK]
+30: microsoft/BiomedNLP-BiomedBERT-large-uncased-abstract       bert 335141888 30522  1024    24    16 [MASK]
+                                                    model       type     param vocab embed layer heads   mask
+```
+
+**Missing values of year tokens (1800\~2019):**
+
+-   `"albert"` series: 3 missing
+    -   1807, 1809, 1817
+-   `"ModernBERT"` series: 65 missing
+    -   1801\~1829, 1831\~1839, 1841\~1847, 1849, 1851\~1859, 1869, 1871\~1875, 1877\~1879, 1883
+-   `"roberta"` series, `"muppet"` series, `"distilroberta-base"`, `"cardiffnlp/twitter-roberta-base"`, `"vinai/bertweet-large"`: 79 missing
+    -   1801\~1829, 1831\~1839, 1841\~1849, 1851\~1859, 1864, 1866\~1869, 1871\~1879, 1881\~1885, 1887, 1891, 1892, 1894
+-   `"vinai/bertweet-base"`: 29 missing
+    -   1801\~1811, 1813\~1814, 1816\~1819, 1821\~1823, 1825\~1829, 1831, 1833, 1834, 1843
+-   `"BiomedBERT"` series: 163 missing
+    -   1801\~1949, 1951\~1959, 1961\~1964, 1967
+
+#### Information of the 30 Chinese Models
+
+```         
+                                                          model          type      param vocab embed layer heads   mask
+                                                         <fctr>        <fctr>      <int> <int> <int> <int> <int> <fctr>
+ 1:                                           bert-base-chinese          bert  102267648 21128   768    12    12 [MASK]
+ 2:                                alibaba-pai/pai-bert-base-zh          bert  102267648 21128   768    12    12 [MASK]
+ 3:                              alibaba-pai/pai-ckbert-base-zh          bert  102269184 21130   768    12    12 [MASK]
+ 4:                             alibaba-pai/pai-ckbert-large-zh          bert  325524480 21130  1024    24    16 [MASK]
+ 5:                              alibaba-pai/pai-ckbert-huge-zh megatron-bert 1257367552 21248  2048    24     8 [MASK]
+ 6:                                        hfl/chinese-bert-wwm          bert  102267648 21128   768    12    12 [MASK]
+ 7:                                    hfl/chinese-bert-wwm-ext          bert  102267648 21128   768    12    12 [MASK]
+ 8:                                 hfl/chinese-roberta-wwm-ext          bert  102267648 21128   768    12    12 [MASK]
+ 9:                                       hfl/chinese-lert-base          bert  102267648 21128   768    12    12 [MASK]
+10:                                      hfl/chinese-lert-large          bert  325522432 21128  1024    24    16 [MASK]
+11:                                    hfl/chinese-macbert-base          bert  102267648 21128   768    12    12 [MASK]
+12:                                   hfl/chinese-macbert-large          bert  325522432 21128  1024    24    16 [MASK]
+13:                     hfl/chinese-electra-180g-base-generator       electra   22108608 21128   768    12     3 [MASK]
+14:                    hfl/chinese-electra-180g-large-generator       electra   41380096 21128  1024    24     4 [MASK]
+15:                               uer/chinese_roberta_L-6_H-512          bert   30258688 21128   512     6     8 [MASK]
+16:                               uer/chinese_roberta_L-8_H-512          bert   36563456 21128   512     8     8 [MASK]
+17:                              uer/chinese_roberta_L-10_H-512          bert   42868224 21128   512    10     8 [MASK]
+18:                              uer/chinese_roberta_L-12_H-512          bert   49172992 21128   512    12     8 [MASK]
+19:                               uer/chinese_roberta_L-6_H-768          bert   59740416 21128   768     6    12 [MASK]
+20:                               uer/chinese_roberta_L-8_H-768          bert   73916160 21128   768     8    12 [MASK]
+21:                              uer/chinese_roberta_L-10_H-768          bert   88091904 21128   768    10    12 [MASK]
+22:                              uer/chinese_roberta_L-12_H-768          bert  102267648 21128   768    12    12 [MASK]
+23:                uer/roberta-base-wwm-chinese-cluecorpussmall          bert  102267648 21128   768    12    12 [MASK]
+24:               uer/roberta-large-wwm-chinese-cluecorpussmall          bert  325522432 21128  1024    24    16 [MASK]
+25:               IDEA-CCNL/Erlangshen-MacBERT-325M-NLI-Chinese          bert  325625856 21229  1024    24    16 [MASK]
+26:     IDEA-CCNL/Erlangshen-TCBert-330M-Classification-Chinese          bert  325522432 21128  1024    24    16 [MASK]
+27: IDEA-CCNL/Erlangshen-TCBert-330M-Sentence-Embedding-Chinese          bert  325522432 21128  1024    24    16 [MASK]
+28:             IDEA-CCNL/Erlangshen-UniMC-RoBERTa-110M-Chinese          bert  102267648 21128   768    12    12 [MASK]
+29:             IDEA-CCNL/Erlangshen-UniMC-RoBERTa-330M-Chinese          bert  325522432 21128  1024    24    16 [MASK]
+30:        IDEA-CCNL/Erlangshen-UniMC-MegatronBERT-1.3B-Chinese megatron-bert 1257367552 21248  2048    24     8 [MASK]
+                                                          model          type      param vocab embed layer heads   mask
+```
+
+**Missing values of year tokens (1800\~2019):**
+
+-   All: 77 missing
+    -   1801\~1839, 1841\~1849, 1851\~1859, 1861\~1866, 1869, 1872\~1879, 1881, 1883, 1887, 1891, 1892
+
+#### Device Information
+
+```         
+ℹ Device Info:
+
+R Packages:
+FMAT          2025.12
+reticulate    1.44.1
+
+Python Packages:
+transformers  4.57.3
+torch         2.9.1+cu130
+huggingface-hub  0.36.0
+
+NVIDIA GPU CUDA Support:
+CUDA Enabled: TRUE
+GPU (Device): NVIDIA GeForce RTX 5060 Laptop GPU
+```
+
+(Tested 2025-12-14 on the developer's computer: HP Zbook X ZHAN99 G1i 16 inch - Intel Ultra9 285H - 64GB/2T - NVIDIA GeForce RTX 5060 Laptop GPU - Mobile Workstation PC)
 
 ## Related Packages
 
