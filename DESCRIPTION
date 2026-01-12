@@ -1,7 +1,7 @@
 Package: FMAT
 Title: The Fill-Mask Association Test
-Version: 2025.12
-Date: 2025-12-15
+Version: 2026.1
+Date: 2026-01-01
 Authors@R: 
     c(person(given = "Han Wu Shuang",
              family = "Bao",
@@ -12,10 +12,10 @@ Maintainer: Han Wu Shuang Bao <baohws@foxmail.com>
 Description: 
     The Fill-Mask Association Test ('FMAT')
     <doi:10.1037/pspa0000396>
-    is an integrative and probability-based method using
-    Masked Language Models to measure conceptual associations
+    is an integrative, probability-based social computing method
+    using Masked Language Models to measure conceptual associations
     (e.g., attitudes, biases, stereotypes, social norms, cultural values)
-    as propositions in natural language.
+    as propositional semantic representations in natural language.
     Supported language models include 'BERT'
     <doi:10.48550/arXiv.1810.04805> and its variants available at 'Hugging Face'
     <https://huggingface.co/models?pipeline_tag=fill-mask>.
@@ -32,8 +32,8 @@ Imports: reticulate, data.table, stringr, forcats, rvest, psych, irr,
 Suggests: bruceR, PsychWordVec, text, sweater, nlme
 RoxygenNote: 7.3.3
 NeedsCompilation: no
-Packaged: 2025-12-15 06:11:55 UTC; baohw
+Packaged: 2026-01-12 01:46:29 UTC; baohw
 Author: Han Wu Shuang Bao [aut, cre] (ORCID:
     <https://orcid.org/0000-0003-3043-710X>)
 Repository: CRAN
-Date/Publication: 2025-12-15 06:30:02 UTC
+Date/Publication: 2026-01-12 05:50:02 UTC
